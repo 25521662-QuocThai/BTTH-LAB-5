@@ -1,0 +1,125 @@
+#ifndef NHANVIEN_H
+#define NHANVIEN_H
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+class NhanVien{
+    protected:
+    string HovaTen;
+    string NgaySinh ;
+    double Luong ;
+    
+    public:
+    
+    NhanVien() {}
+    NhanVien(string ten, string d , double tien): HovaTen(ten), NgaySinh(d), Luong(tien){}
+    virtual ~NhanVien() {}
+    
+    virtual void Nhap() ;
+    virtual void Xuat() const ;
+    virtual float tinhLuong() const = 0;
+    
+};
+class NhanVienVanPhong : public NhanVien {
+    private:
+    int SoNgayLam ;
+    
+    public:
+    
+    NhanVienVanPhong(): NhanVien("","",0), SoNgayLam(0) {}
+    ~NhanVienVanPhong() {}
+    
+    void Nhap() override;
+    void Xuat() const override ;
+    float tinhLuong() const override;
+};
+class NhanVienSanXuat : public NhanVien {
+    private:
+    int LuongCanBan ;
+    int SoSanPham ;
+    
+    public:
+    
+    NhanVienSanXuat(): NhanVien("","",0), LuongCanBan(0), SoSanPham(0) {}
+    ~NhanVienSanXuat() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    float tinhLuong() const override;
+};
+class CongTy{
+    private:
+    vector<unique_ptr<NhanVien>> dsNhanVien ;
+    
+    public:
+    CongTy() {}
+    CongTy(): dsNhanVien(0) {}
+    ~CongTy() {}
+    
+    void Nhapds();
+    void Xuatds();
+    float tinhTongLuong() ;
+    float minLuongnvSanXuat() ;
+    void maxTuoinvVanPhong() ;
+};
+#endif 
+
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include "NhanVien.h"
+using namespace std;
+
+// CLASS NHANVIEN 
+void NhanVien::Nhap(){
+    cout <<" Ho va ten nhan vien " << endl ;
+    getline(cin, HovaTen) ;
+    cout <<" Ngay thang nam sinh : "<< endl ;
+    getline(cin, NgaySinh) ;
+}
+void NhanVien::Xuat() const {
+    cout <<" Ten: "<< HovaTen <<"\n Ngay Sinh:" << NgaySinh ;
+         
+}
+// CLASS NHAN VIEN VAN PHONG
+void NhanVienVanPhong::Nhap() override{
+    cout<<"=====Nhap thong tin nhan vien van phong=======" << endl ;
+    NhanVien::Nhap() ;
+    cout <<" So ngay lam viec: " ;
+    cin >> SoNgayLam ;
+}
+void NhanVienVanPhong::Xuat() const override {
+    cout<<"=====Thong tin nhan vien van phong=======" << endl ;
+    NhanVien::Xuat() ;
+    cout <<"\n So ngay lam viec: " << SoNgayLam << endl ;
+    cout <<"\n Luong:" << tinhLuong() << endl;
+}
+float NhanVienVanPhong::tinhLuong() const override {
+    return SoNgayLam * 100000 ;
+}
+// CLASS NHAN VIEN SAN XUAT 
+void NhanVienSanXuat::Nhap() override {
+    cout<<"=====Nhap thong tin nhan vien san xuat=======" << endl ;
+    NhanVien::Nhap();
+    cout <<" luong co ban:" ;
+    cin >> LuongCanBan;
+    cout <<" so san pham:" ;
+    cin >> SoSanPham ;
+}
+void NhanVienSanXuat::Xuat() const override {
+    cout<<"=====Thong tin nhan vien san xuat=======" << endl ;
+    NhanVien::Xuat() ;
+    cout <<"\n Luong co ban: " << LuongCanBan ;
+    cout <<"\n So san pham: " << SoSanPham ;
+    cout <<"\n Luong: " << tinhLuong() << endl ;
+}
+float NhanVienSanXuat::tinhLuong() const override {
+    return LuongCanBan + SoSanPham * 5000 ;
+}
+int main()
+{
+
+    return 0;
+}
