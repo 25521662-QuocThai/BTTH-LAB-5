@@ -69,6 +69,8 @@ class CongTy{
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <limits>
+#include <stdexcept>
 #include "NhanVien.h"
 using namespace std;
 
@@ -87,23 +89,23 @@ int NhanVien::tinhTuoi() const {
     return 2026 - nam ;
 }
 // CLASS NHAN VIEN VAN PHONG
-void NhanVienVanPhong::Nhap() override {
+void NhanVienVanPhong::Nhap() {
     cout<<"=====Nhap thong tin nhan vien van phong=======" << endl ;
     NhanVien::Nhap() ;
     cout <<" So ngay lam viec: " ;
     cin >> SoNgayLam ;
 }
-void NhanVienVanPhong::Xuat() const override {
+void NhanVienVanPhong::Xuat() const {
     cout<<"=====Thong tin nhan vien van phong=======" << endl ;
     NhanVien::Xuat() ;
     cout <<"\n So ngay lam viec: " << SoNgayLam << endl ;
     cout <<"\n Luong:" << tinhLuong() << endl;
 }
-float NhanVienVanPhong::tinhLuong() const override {
+float NhanVienVanPhong::tinhLuong() const {
     return SoNgayLam * 100000 ;
 }
 // CLASS NHAN VIEN SAN XUAT 
-void NhanVienSanXuat::Nhap() override {
+void NhanVienSanXuat::Nhap() {
     cout<<"=====Nhap thong tin nhan vien san xuat=======" << endl ;
     NhanVien::Nhap();
     cout <<" luong co ban:" ;
@@ -111,14 +113,14 @@ void NhanVienSanXuat::Nhap() override {
     cout <<" so san pham:" ;
     cin >> SoSanPham ;
 }
-void NhanVienSanXuat::Xuat() const override {
+void NhanVienSanXuat::Xuat() const {
     cout<<"=====Thong tin nhan vien san xuat=======" << endl ;
     NhanVien::Xuat() ;
     cout <<"\n Luong co ban: " << LuongCanBan ;
     cout <<"\n So san pham: " << SoSanPham ;
     cout <<"\n Luong: " << tinhLuong() << endl ;
 }
-float NhanVienSanXuat::tinhLuong() const override {
+float NhanVienSanXuat::tinhLuong() const {
     return LuongCanBan + SoSanPham * 5000 ;
 }
 // CLASS CONG TY 
@@ -126,6 +128,7 @@ void CongTy::Nhapds(){
     cout <<" Nhap so luong nhan vien: " ;
     int n ;
     cin >> n ;
+    cin.ignore() ;
     int loai ;
     
     for(int i = 0; i < n ; i++){
@@ -146,9 +149,9 @@ void CongTy::Nhapds(){
         }
     }
 }
-void CongTy::Xuatds(){
+void CongTy::Xuatds() const{
     if(dsNhanVien.empty()){
-        cout <<" Danh sach rong! " << endl ;
+        throw runtime_error(" danh sach rong ") ;
         return ;
     }
     cout<<"======Danh sach nhan vien =========" << endl ;
@@ -157,15 +160,18 @@ void CongTy::Xuatds(){
         dsNhanVien[i]->Xuat();
     }
 }
-float CongTy::tinhTongLuong(){
+float CongTy::tinhTongLuong() const{
+    float tongLuong = 0 ;
     for(int i = 0 ; i < dsNhanVien.size(); i++){
-        dsNhanVien.Luong += dsNhanVien[i]->tinhLuong() ;
+        tongLuong += dsNhanVien[i]->tinhLuong() ;
     }
-    return dsNhanVien.Luong ;
+    return tongLuong ;
 }
-void CongTy::minLuongnvSanXuat(){
-     float minLuong = 9999999999 ;
+void CongTy::minLuongnvSanXuat() const{
+     float minLuong = numeric_limits<float>::max() ;
      int indexMax = -1;
+     
+     for(int i = 0 ; i < dsNhanVien.size(); i++){
      NhanVienSanXuat* nvSX = dynamic_cast<NhanVienSanXuat*>(dsNhanVien[i].get());
      
      if(nvSX != nullptr){
@@ -173,23 +179,24 @@ void CongTy::minLuongnvSanXuat(){
          if(luong < minLuong){
             minLuong = luong ;
             indexMax = i ;
-         }
+            }
+        }
      }
-     
      if( indexMax != -1){
-         cout <<" Nhan vien thu " << i+1 <<" co luong thap nhat:";
+         cout <<" Nhan vien thu " << indexMax+1 <<" co luong thap nhat:";
          cout << minLuong << endl ;
      }
-     else cout <<" khong co nhan vien van phong " << endl ;
+     else cout <<" khong co nhan vien san xuat " << endl ;
 }
-void CongTy::maxTuoinvVanPhong(){
-    float maxTuoi = -1 ;
+void CongTy::maxTuoinvVanPhong() const{
+    int maxTuoi = -1 ;
     int indexMax = -1 ;
     for( int i = 0 ; i < dsNhanVien.size(); i++){
+    
     NhanVienVanPhong* nvVP = dynamic_cast<NhanVienVanPhong*>(dsNhanVien[i].get());
     
     if(nvVP != nullptr){
-        float tuoi = nvVP->tinhTuoi() ;
+        int tuoi = nvVP->tinhTuoi() ;
         if(tuoi > maxTuoi){
             maxTuoi = tuoi;
             indexMax = i ;
@@ -197,20 +204,25 @@ void CongTy::maxTuoinvVanPhong(){
         }
     }
     if(indexMax != -1){
-        cout <<" Nhan vien thu "<< i+1<<" co tuoi lon nhat:" ;
+        cout <<" Nhan vien thu "<< indexMax+1<<" co tuoi lon nhat:" ;
         cout << maxTuoi << endl ;
+    }
     else cout <<" khong co nhan vien van phong " ;
     
 }
 int main()
 {
+    try {
     CongTy ct ;
     ct.Nhapds() ;
     ct.Xuatds() ;
     cout <<" Tong luong cong ty phai tra: " ;
-    ct.tinhTongLuong() ;
-    cout<<endl ;
+    cout<< ct.tinhTongLuong() << endl ;
     ct.minLuongnvSanXuat() ;
     ct.maxTuoinvVanPhong() ;
+    }
+    catch(exception & e){
+        cout<<" LOI!:" << e.what() << endl ;
+    }
 
 }
