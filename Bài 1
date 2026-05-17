@@ -68,7 +68,7 @@ class CongTy{
 
 #include <iostream>
 #include <vector>
-#include <cstring>
+#include <memory>
 #include "NhanVien.h"
 using namespace std;
 
@@ -77,14 +77,17 @@ void NhanVien::Nhap(){
     cout <<" Ho va ten nhan vien " << endl ;
     getline(cin, HovaTen) ;
     cout <<" Ngay thang nam sinh : "<< endl ;
-    getline(cin, NgaySinh) ;
+    cin >> ngay >> thang >> nam ;
 }
 void NhanVien::Xuat() const {
-    cout <<" Ten: "<< HovaTen <<"\n Ngay Sinh:" << NgaySinh ;
+    cout <<" Ten: "<< HovaTen <<"\n Ngay Sinh:" << ngay <<"/" << thang <<"/"<< nam ;
          
 }
+int NhanVien::tinhTuoi() const {
+    return 2026 - nam ;
+}
 // CLASS NHAN VIEN VAN PHONG
-void NhanVienVanPhong::Nhap() override{
+void NhanVienVanPhong::Nhap() override {
     cout<<"=====Nhap thong tin nhan vien van phong=======" << endl ;
     NhanVien::Nhap() ;
     cout <<" So ngay lam viec: " ;
@@ -118,8 +121,96 @@ void NhanVienSanXuat::Xuat() const override {
 float NhanVienSanXuat::tinhLuong() const override {
     return LuongCanBan + SoSanPham * 5000 ;
 }
+// CLASS CONG TY 
+void CongTy::Nhapds(){
+    cout <<" Nhap so luong nhan vien: " ;
+    int n ;
+    cin >> n ;
+    int loai ;
+    
+    for(int i = 0; i < n ; i++){
+        cout <<" Nhap loai nhan vien(1= San Xuat, 2= Van Phong) " << endl ;
+        cin >> loai ;
+        cin.ignore();
+        // Tạo unique_ptr chứa NhanVienVanPhong
+        if(loai == 1){
+            unique_ptr<NhanVien> nv = make_unique<NhanVienSanXuat>() ;
+            nv->Nhap() ;
+            dsNhanVien.push_back(move(nv)) ;
+        }
+        // Tạo unique_ptr chứa NhanVienSanXuat
+        if(loai == 2){
+            unique_ptr<NhanVien> nv = make_unique<NhanVienVanPhong>() ;
+            nv->Nhap() ;
+            dsNhanVien.push_back(move(nv)) ; // move: chuyen vao vector
+        }
+    }
+}
+void CongTy::Xuatds(){
+    if(dsNhanVien.empty()){
+        cout <<" Danh sach rong! " << endl ;
+        return ;
+    }
+    cout<<"======Danh sach nhan vien =========" << endl ;
+    for(int i = 0 ; i < dsNhanVien.size(); i++){
+        cout <<" -Nhan vien " << i+1 << endl ;
+        dsNhanVien[i]->Xuat();
+    }
+}
+float CongTy::tinhTongLuong(){
+    for(int i = 0 ; i < dsNhanVien.size(); i++){
+        dsNhanVien.Luong += dsNhanVien[i]->tinhLuong() ;
+    }
+    return dsNhanVien.Luong ;
+}
+void CongTy::minLuongnvSanXuat(){
+     float minLuong = 9999999999 ;
+     int indexMax = -1;
+     NhanVienSanXuat* nvSX = dynamic_cast<NhanVienSanXuat*>(dsNhanVien[i].get());
+     
+     if(nvSX != nullptr){
+         float luong = nvSX->tinhLuong() ;
+         if(luong < minLuong){
+            minLuong = luong ;
+            indexMax = i ;
+         }
+     }
+     
+     if( indexMax != -1){
+         cout <<" Nhan vien thu " << i+1 <<" co luong thap nhat:";
+         cout << minLuong << endl ;
+     }
+     else cout <<" khong co nhan vien van phong " << endl ;
+}
+void CongTy::maxTuoinvVanPhong(){
+    float maxTuoi = -1 ;
+    int indexMax = -1 ;
+    for( int i = 0 ; i < dsNhanVien.size(); i++){
+    NhanVienVanPhong* nvVP = dynamic_cast<NhanVienVanPhong*>(dsNhanVien[i].get());
+    
+    if(nvVP != nullptr){
+        float tuoi = nvVP->tinhTuoi() ;
+        if(tuoi > maxTuoi){
+            maxTuoi = tuoi;
+            indexMax = i ;
+            }
+        }
+    }
+    if(indexMax != -1){
+        cout <<" Nhan vien thu "<< i+1<<" co tuoi lon nhat:" ;
+        cout << maxTuoi << endl ;
+    else cout <<" khong co nhan vien van phong " ;
+    
+}
 int main()
 {
+    CongTy ct ;
+    ct.Nhapds() ;
+    ct.Xuatds() ;
+    cout <<" Tong luong cong ty phai tra: " ;
+    ct.tinhTongLuong() ;
+    cout<<endl ;
+    ct.minLuongnvSanXuat() ;
+    ct.maxTuoinvVanPhong() ;
 
-    return 0;
 }
