@@ -1,0 +1,298 @@
+#ifndef GIAODICH_H
+#define GIAODICH_H
+
+#include <iostream>
+#include <string>
+#include <memory>
+#include <vector>
+#include <iomanip>
+using namespace std;
+
+// ========== CLASS TIME ==========
+class Time {
+    private:
+    int ngay, thang, nam;
+    bool KiemtraHopLe() const ;
+    public:
+    // CONSTRUCTOR
+    Time() : ngay(0), thang(0), nam(0) {}
+    Time(int d, int m, int y) : ngay(d), thang(m), nam(y) {}
+    
+    // GETTER
+    int getThang() const { return thang; }
+    int getNam() const { return nam; }
+    
+    void Nhap();
+    void Xuat() const;
+};
+
+// CLASS GIAODICH (BASE CLASS)
+class GiaoDich {
+    protected:
+    string ma_GD;
+    Time ngayGD;
+    double DonGia;
+    double DienTich;
+    
+    public:
+    // CONSTRUCTOR
+    GiaoDich() : ma_GD(""), DonGia(0), DienTich(0) {}
+    virtual ~GiaoDich() {}
+    
+    
+    virtual void Nhap();
+    virtual void Xuat() const;
+    
+    
+    virtual double Tongtien() const = 0;
+    
+    
+    Time getNgayGD() const { return ngayGD; }
+    
+};
+
+// CLASS DAT(A, B, C)
+class Dat_Loai_A : public GiaoDich {
+    private:
+    char loai = 'A';  
+    
+    public:
+    Dat_Loai_A() : GiaoDich(), loai('A') {}
+    virtual ~Dat_Loai_A() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    double Tongtien() const override;  
+};
+
+class Dat_Loai_B : public GiaoDich {
+    private:
+    char loai = 'B';  
+    
+    public:
+    Dat_Loai_B() : GiaoDich(), loai('B') {}
+    virtual ~Dat_Loai_B() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    double Tongtien() const override;
+};
+
+class Dat_Loai_C : public GiaoDich {
+    private:
+    char loai = 'C';  
+    
+    public:
+    Dat_Loai_C() : GiaoDich(), loai('C') {}
+    virtual ~Dat_Loai_C() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    double Tongtien() const override;
+};
+
+// CLASS NHA PHO  
+class Nha_Cao_Cap : public GiaoDich {
+    private:
+    string address;
+    string loaiNha = "cao cap";  
+    
+    public:
+    Nha_Cao_Cap() : GiaoDich(), address(""), loaiNha("cao cap") {}
+    virtual ~Nha_Cao_Cap() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    double Tongtien() const override;
+};
+
+class Nha_Thuong : public GiaoDich {
+    private:
+    string address;
+    string loaiNha = "thuong";  
+    
+    public:
+    Nha_Thuong() : GiaoDich(), address(""), loaiNha("thuong") {}
+    virtual ~Nha_Thuong() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    double Tongtien() const override;
+};
+
+//CLASS CAN HO CHUNG CU
+class CanHoChungCu : public GiaoDich {
+    private:
+    string maCanHo;
+    int VitriTang;
+    
+    public:
+    CanHoChungCu() : GiaoDich(), maCanHo(""), VitriTang(0) {}
+    virtual ~CanHoChungCu() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    double Tongtien() const override;
+};
+
+// CLASS CONG TY
+class Congty {
+    private:
+    vector<unique_ptr<GiaoDich>> dsGiaoDich;
+    
+    public:
+    Congty() = default;
+    ~Congty() = default; 
+    
+    void Nhap();
+    void Xuat() const; 
+    void XuatGD_12_2024() const;
+    void TongGDTungLoai() const;
+    void GiaTrungBinhCanHo() const;
+    void MaxGD_NhaPho() const; 
+};
+
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <limits>
+#include <stdexcept>
+#include "GiaoDich.h"
+using namespace std;
+
+bool Time::KiemtraHopLe() const{
+    int ngayThang = 0;
+    switch(thang){
+        case 4: case 6: case 9: case 11: 
+        ngayThang = 30 ;
+        break ;
+        case 2:
+        ngayThang = (nam % 400 ==0 || (nam % 100 != 0 && nam & 4 ==0)) ? 29:28 ;
+        break ;
+        default: ngayThang = 31 ;
+         
+    }
+    if( ngay < 0 || thang < 0 || nam < 0) return false ;
+    else if( ngay > ngayThang) return false ;
+    else if( thang > 12) return false ;
+    else return true ;
+}
+void Time::Nhap(){
+    cout <<" Nhap ngay thang nam: " ;
+    cin >> ngay >> thang >> nam ;
+    if(KiemtraHopLe()){
+        throw invalid_argument(" Ngay Thang Nam khong hop le ");
+     
+}
+void Time::Xuat() const {
+    cout << ngay <<"/"<< thang<< "/" << nam ;
+}
+// CLASS GIAODICH (BASE CLASS)
+void GiaoDich::Nhap(){
+    cout <<" Nhap ma giao dich: " ;
+    getline(cin, ma_GD) ;
+    cout <<" Thoi gian giao dich: " ;
+    ngayGD.Nhap() ;
+    cout <<" Don gia: " ;
+    cin >> DonGia ;
+    cout <<" Dien tich san pham: " ;
+    cin >> DienTich ;
+}
+void GiaoDich::Xuat() const {
+    cout <<" Ma giao dich: " << ma_GD << endl ;
+    cout <<" Thoi gian giao dich: "<< ngayGD.Xuat() << endl ;
+    cout <<" Don gia: " << DonGia << endl ;
+    cout <<" Dien tich san pham: " << DienTich << endl ;
+}
+// CLASS DAT(A, B, C)
+void Dat_Loai_A::Nhap(){
+    GiaoDich::Nhap() ;
+}
+void Dat_Loai_A::Xuat() const {
+    cout <<"=======THONG TIN DAT LOAI A=======" << endl ;
+    GiaoDich::Xuat()
+    cout <<" Gia tien: "<< Tongtien() << endl ;
+}
+double Dat_Loai_A::Tongtien() const {
+    return DienTich * DonGia * 1.5 ;
+}
+// DAT LOAI B
+void Dat_Loai_B::Nhap(){
+    GiaoDich::Nhap() ;
+}
+void Dat_Loai_B::Xuat() const {
+    cout <<"=======THONG TIN DAT LOAI B=======" << endl ;
+    GiaoDich::Xuat()
+    cout <<" Gia tien: "<< Tongtien() << endl ;
+}
+double Dat_Loai_B::Tongtien() const {
+    return DienTich * DonGia ;
+}
+// DAT LOAI C
+void Dat_Loai_C::Nhap(){
+    GiaoDich::Nhap() ;
+}
+void Dat_Loai_C::Xuat() const {
+    cout <<"=======THONG TIN DAT LOAI C=======" << endl ;
+    GiaoDich::Xuat()
+    cout <<" Gia tien: "<< Tongtien() << endl ;
+}
+double Dat_Loai_C::Tongtien() const {
+    return DienTich * DonGia ;
+}
+// CLASS NHA PHO 
+// CAO CAP
+void Nha_Cao_Cap::Nhap{
+    GiaoDich::Nhap() ;
+    cout <<" Dia chi nha pho: " ;
+    getline(cin, address) ;
+}
+void Nha_Cao_Cap::Xuat() const {
+    cout << "====== THONG TIN NHA CAO CAP ======" << endl ;
+    GiaoDich::Xuat() ;
+    cout <<" Dia chi: " << address << endl ;
+    cout <<" Gia tien: " << Tongtien() << endl ;
+}
+double Nha_Cao_Cap::Tongtien() const {
+    return DienTich * DonGia ;
+}
+// THUONG
+void Nha_Thuong::Nhap{
+    GiaoDich::Nhap() ;
+    cout <<" Dia chi nha pho: " ;
+    getline(cin, address) ;
+}
+void Nha_Thuong::Xuat() const {
+    cout <<"====== THONG TIN NHA THUONG ======" << endl ;
+    GiaoDich::Xuat() ;
+    cout <<" Dia chi: " << address << endl ;
+    cout <<" Gia tien: " << Tongtien() << endl ;
+}
+double Nha_Thuong::Tongtien() const {
+    return DienTich * DonGia * 0.9 ;
+}
+//CLASS CAN HO CHUNG CU
+void CanHoChungCu::Nhap(){
+    GiaoDich::Nhap() ;
+    cout <<" Ma can ho: " ;
+    getline(cin, maCanHo) ;
+    cout <<" Nhap so tang: " ;
+    cin >> VitriTang ;
+}
+void CanHoChungCu::Xuat() const {
+    cout <<"====== THONG TIN CAN HO CHUNG CU TANG " << VitriTang << "======" <<endl ;
+    GiaoDich::Xuat() ;
+    cout <<" Ma can ho: " << maCanHo << endl ;
+    cout <<" Gia tien: " << Tongtien() << endl ;
+}
+double CanHoChungCu::Tongtien() const {
+    if(VitriTang == 1) return DienTich * DonGia * 2 ;
+    else if(VitriTang > 14) return DienTich * DonGia * 1.2 ;
+    else return DienTich * DonGia ;
+}
+    
+    
+
+    
+#endif
+
