@@ -77,10 +77,9 @@ using namespace std;
 // CLASS NHANVIEN 
 void NhanVien::Nhap(){
     cout <<" Ho va ten: "  ;
-    getline(cin, HovaTen) ; cout << endl ;
+    getline(cin, HovaTen) ; 
     cout <<" Ngay thang nam sinh : "  ;
     cin >> ngay >> thang >> nam ;
-    cout << endl ;
 }
 void NhanVien::Xuat() const {
     cout <<" Ten: "<< HovaTen <<"\n Ngay Sinh:" << ngay <<"/" << thang <<"/"<< nam ;
