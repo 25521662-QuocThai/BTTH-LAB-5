@@ -151,7 +151,7 @@ class Congty {
     void GiaTrungBinhCanHo() const;
     void MaxGD_NhaPho() const; 
 };
-
+#endif
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -290,9 +290,139 @@ double CanHoChungCu::Tongtien() const {
     else if(VitriTang > 14) return DienTich * DonGia * 1.2 ;
     else return DienTich * DonGia ;
 }
+void Congty::Nhap(){
+    int n ;
+    cout <<" Nhap so luong giao dich: " ;
+    cin >> n ;
     
+    int loai ;
+    for(int i = 0 ; i < n; i++){
+        cout <<"===== Giao dich " << i+1 <<"========" << endl ;
+        cout <<"1=Dat_A, 2=Dat_B, 3=Dat_C, 4=Nha_Cao_Cap, 5=Nha_Thuong, 6=CanHo: ";
+        cin >> loai ;
+        unique_ptr<GiaoDich> gb ;
+        
+        switch(loai){
+            case 1: 
+            gb = make_unique<Dat_Loai_A>() ;
+            break;
+            case 2:
+            gb = make_unique<Dat_Loai_B>() ;
+            break;
+            case 3:
+            gb = make_unique<Dat_Loai_C>() ;
+            break;
+            case 4:
+            gb = make_unique<Nha_Cao_Cap>() ;
+            break;
+            case 5:
+            gb = make_unique<Nha_Thuong>() ;
+            break;
+            case 6:
+            gb = make_unique<CanHoChungCu>() ;
+            break;
+            default: 
+            cout <<" Khong co giao dich hop le " << endl ;
+            i-- ;
+            continue ;
+        }
+        gb->Nhap() ;
+        dsGiaoDich.push_back(move(gb)) ;
+    }
+}
+void Congty::Xuat() const {
+    cout<<"========Danh sach giao dich========" << endl ;
+    for(auto& gd: dsGiaoDich){
+        gd->Xuat() ;
+    }
+}
+void Congty::XuatGD_12_2024() const {
+    cout << "\n===== GIAO DICH THANG 12 NAM 2024 =====" << endl;
+    bool found = false;
     
+    for(auto& gd : dsGiaoDich) {
+        Time t = gd->getNgayGD();
+        if(t.getThang() == 12 && t.getNam() == 2024) {
+            gd->Xuat();
+            cout << "\n" << string(50, '-') << endl;
+            found = true;
+        }
+    }
+    
+    if(!found) cout << "Khong co giao dich thang 12/2024\n";
+}
 
+void Congty::LuongGDTungLoai() const {
+    int datA = 0, datB = 0, datC = 0, nhaCap = 0, nhaT = 0, canHo = 0;
     
-#endif
+    for(auto& gd : dsGiaoDich) {
+        if(dynamic_cast<Dat_Loai_A*>(gd.get())) datA++;
+        else if(dynamic_cast<Dat_Loai_B*>(gd.get())) datB++;
+        else if(dynamic_cast<Dat_Loai_C*>(gd.get())) datC++;
+        else if(dynamic_cast<Nha_Cao_Cap*>(gd.get())) nhaCap++;
+        else if(dynamic_cast<Nha_Thuong*>(gd.get())) nhaT++;
+        else if(dynamic_cast<CanHoChungCu*>(gd.get())) canHo++;
+    }
+    
+    cout << "\n===== SO LUONG GIAO DICH TUNG LOAI =====" << endl;
+    cout << "Dat loai A: " << datA << endl;
+    cout << "Dat loai B: " << datB << endl;
+    cout << "Dat loai C: " << datC << endl;
+    cout << "Nha cao cap: " << nhaCap << endl;
+    cout << "Nha thuong: " << nhaT << endl;
+    cout << "Can ho chung cu: " << canHo << endl;
+}
 
+void Congty::GiaTrungBinhCanHo() const {
+    double tongTien = 0;
+    int count = 0;
+    
+    for(auto& gd : dsGiaoDich) {
+        if(dynamic_cast<CanHoChungCu*>(gd.get())) {
+            tongTien += gd->Tongtien();
+            count++;
+        }
+    }
+    
+    if(count > 0) {
+        cout << "\n===== GIA TRUNG BINH CAN HO =====" << endl;
+        cout << "Trung binh: " << fixed << setprecision(0) << (tongTien / count) << endl;
+    } else {
+        cout << "Khong co can ho!\n";
+    }
+}
+
+void Congty::MaxGiaTheTich_NhaPhong() const {
+    double maxTien = 0;
+    int indexMax = -1;
+    
+    for(int i = 0; i < dsGiaoDich.size(); i++) {
+        if(dynamic_cast<Nha_Cao_Cap*>(dsGiaoDich[i].get()) || 
+           dynamic_cast<Nha_Thuong*>(dsGiaoDich[i].get())) {
+            if(dsGiaoDich[i]->Tongtien() > maxTien) {
+                maxTien = dsGiaoDich[i]->Tongtien();
+                indexMax = i;
+            }
+        }
+    }
+    
+    if(indexMax != -1) {
+        cout << "\n===== NHA PHO CO GIA CAO NHAT =====" << endl;
+        dsGiaoDich[indexMax]->Xuat();
+    } else {
+        cout << "Khong co nha pho!\n";
+    }
+}
+
+// MAIN
+int main() {
+    Congty ct;
+    ct.Nhap();
+    ct.Xuat();
+    ct.XuatGD_12_2024();
+    ct.LuongGDTungLoai();
+    ct.GiaTrungBinhCanHo();
+    ct.MaxGiaTheTich_NhaPhong();
+    
+    return 0;
+}    
