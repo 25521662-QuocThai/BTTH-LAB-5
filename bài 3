@@ -1,0 +1,105 @@
+#ifndef SINHVIEN_H
+#define SINHVIEN_H
+
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <cstring>
+using namespace std;
+
+class SinhVien{
+    protected:
+    string HovaTen ;
+    string ma_Sv ;
+    string address ;
+    int SoChi ;
+    double DiemTb ;
+    
+    public:
+    SinhVien(): HovaTen(""), ma_Sv(""), address(""), SoChi(0), DiemTb(0) {}
+    virtual ~SinhVien() {} 
+    
+    virtual void Nhap() ;
+    virtual void Xuat() const ;
+};
+
+class SinhVien_CaoDang : public SinhVien {
+    private:
+    double Diem_TotNghiep ;
+    
+    public:
+    SinhVien_CaoDang() : SinhVien(), Diem_TotNghiep(0) {}
+    virtual ~SinhVien_CaoDang() {}
+    
+    void Nhap() override;
+    void Xuat() const override ;
+};
+
+class SinhVien_DaiHoc : public SinhVien {
+    private:
+    string LuanVan;
+    double Diem_LuanVan;
+    
+    public:
+    SinhVien_DaiHoc() : SinhVien(), Diem_LuanVan(0), LuanVan("") {}
+    virtual ~SinhVien_DaiHoc() {}
+    
+    void Nhap() override;
+    void Xuat() const override ;
+};
+
+class DH_CongNgheThongTin{
+    private:
+    vector<unique_ptr<SinhVien>> dsSinhVien;
+    
+    public:
+    DH_CongNgheThongTin() {}
+    ~DH_CongNgheThongTin() {}
+    
+    void Nhap();
+    void Xuat() const ;
+    void XuatSinhVien_TotNghiep() const ;
+    void XuatSinhVien_0_TotNghiep() const ;
+    void maxSinhVien_DH() const ;
+    void maxSinhVien_CD() const ;
+};
+#endif
+
+#include <iostream>
+#include "SinhVien.h"
+#include <vector>
+#include <memory>
+#include <cstring>
+
+// CLASS SINH VIEN
+void SinhVien::Nhap() {
+	cout <<"====== Nhap thong tin sinh vien: ========" << endl ;
+	cout <<" Nhap ho va ten: " ;
+	getline(cin, HovaTen);
+	cin.ignore();
+	cout <<" Nhap ma sinh vien: ";
+	getline(cin, ma_Sv);
+	cin.ignore();
+	cout <<" Nhap dia chi: ";
+	getline(cin, address);
+	cin.ignore();
+	cout <<" Nhap so tin chi: " ;
+	cin >> SoChi ;
+	cout <<" Nhap diem trung binh: ";
+	cin >> DiemTb;
+}
+void SinhVien::Xuat() const {
+    cout <<"====== Thong tin sinh vien: ========" << endl ;
+    cout <<" Ho va ten: " << HovaTen << endl;
+    cout <<" Ma sinh vien: " << ma_Sv << endl ;
+    cout <<" Dia chi: " << address << endl ;
+    cout <<" So tin chi: " << SoChi << endl ;
+    cout <<" Diem trung binh: " << DiemTb << endl;
+}
+
+int main()
+{
+	std::cout<<"Hello World";
+
+	return 0;
+}
