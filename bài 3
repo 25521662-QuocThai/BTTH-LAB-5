@@ -7,6 +7,7 @@
 #include <cstring>
 using namespace std;
 
+// CLASS SINH VIEN
 class SinhVien{
     protected:
     string HovaTen ;
@@ -21,8 +22,13 @@ class SinhVien{
     
     virtual void Nhap() ;
     virtual void Xuat() const ;
+    
+    int getSoChi() const {return SoChi;}
+    double getDiemTb() const {return DiemTb;}
+    virtual double getDiem_LuanVan() const = 0 ;
+    virtual double getDiem_TotNghiep() const = 0;
 };
-
+// CLASS SINH VIEN CAO DANG
 class SinhVien_CaoDang : public SinhVien {
     private:
     double Diem_TotNghiep ;
@@ -33,8 +39,11 @@ class SinhVien_CaoDang : public SinhVien {
     
     void Nhap() override;
     void Xuat() const override ;
+    
+    double getDiem_TotNghiep() const override {return Diem_TotNghiep;}
+    double getDiem_LuanVan() const override { return 0; } 
 };
-
+// CLASS SINH VIEN DAI HOC
 class SinhVien_DaiHoc : public SinhVien {
     private:
     string LuanVan;
@@ -46,8 +55,11 @@ class SinhVien_DaiHoc : public SinhVien {
     
     void Nhap() override;
     void Xuat() const override ;
+    
+    double getDiem_LuanVan() const override {return Diem_LuanVan;}
+    double getDiem_TotNghiep() const override { return 0; }
 };
-
+// CLASS TRUONG DAI HOC UIT
 class DH_CongNgheThongTin{
     private:
     vector<unique_ptr<SinhVien>> dsSinhVien;
@@ -60,8 +72,8 @@ class DH_CongNgheThongTin{
     void Xuat() const ;
     void XuatSinhVien_TotNghiep() const ;
     void XuatSinhVien_0_TotNghiep() const ;
-    void maxSinhVien_DH() const ;
-    void maxSinhVien_CD() const ;
+    void maxTBSinhVien_DH() const ;
+    void maxTBSinhVien_CD() const ;
 };
 #endif
 
@@ -70,36 +82,171 @@ class DH_CongNgheThongTin{
 #include <vector>
 #include <memory>
 #include <cstring>
-
+using namespace std;
 // CLASS SINH VIEN
 void SinhVien::Nhap() {
-	cout <<"====== Nhap thong tin sinh vien: ========" << endl ;
 	cout <<" Nhap ho va ten: " ;
 	getline(cin, HovaTen);
-	cin.ignore();
 	cout <<" Nhap ma sinh vien: ";
 	getline(cin, ma_Sv);
-	cin.ignore();
 	cout <<" Nhap dia chi: ";
 	getline(cin, address);
-	cin.ignore();
 	cout <<" Nhap so tin chi: " ;
 	cin >> SoChi ;
+	cin.ignore();
 	cout <<" Nhap diem trung binh: ";
 	cin >> DiemTb;
+	cin.ignore();
 }
 void SinhVien::Xuat() const {
-    cout <<"====== Thong tin sinh vien: ========" << endl ;
-    cout <<" Ho va ten: " << HovaTen << endl;
-    cout <<" Ma sinh vien: " << ma_Sv << endl ;
-    cout <<" Dia chi: " << address << endl ;
-    cout <<" So tin chi: " << SoChi << endl ;
-    cout <<" Diem trung binh: " << DiemTb << endl;
+	cout <<" Ho va ten: " << HovaTen << endl;
+	cout <<" Ma sinh vien: " << ma_Sv << endl ;
+	cout <<" Dia chi: " << address << endl ;
+	cout <<" So tin chi: " << SoChi << endl ;
+	cout <<" Diem trung binh: " << DiemTb << endl;
+}
+//CLASS SINH VIEN CAO DANG
+void SinhVien_CaoDang::Nhap() {
+	cout <<"====== Nhap thong tin sinh vien cao dang: ========" << endl ;
+	SinhVien::Nhap() ;
+	cout <<" Nhap diem tot nghiep: " ;
+	cin >> Diem_TotNghiep;
+	cin.ignore();
+}
+void SinhVien_CaoDang::Xuat() const {
+	cout <<"====== Thong tin sinh vien cao dang: ========" << endl ;
+	SinhVien::Xuat() ;
+	cout <<" Diem tot nghiep: " << Diem_TotNghiep << endl;
+}
+// CLASS SINH VIEN DAI HOC
+void SinhVien_DaiHoc::Nhap() {
+	cout <<"====== Nhap thong tin sinh vien dai hoc: ========" << endl ;
+	SinhVien::Nhap() ;
+	cout <<" Nhap ten luan van: " ;
+	getline(cin, LuanVan);
+	cout <<" Nhap diem luan van: ";
+	cin >> Diem_LuanVan;
+	cin.ignore();
+}
+void SinhVien_DaiHoc::Xuat() const {
+	cout <<"====== Thong tin sinh vien dai hoc: ========" << endl ;
+	SinhVien::Xuat() ;
+	cout <<" Ten luan van: " << LuanVan << endl ;
+	cout <<" Diem luan van: " << Diem_LuanVan << endl ;
+}
+// CLAS DH CONG NGHE THONG TIN
+void DH_CongNgheThongTin::Nhap() {
+	cout <<" Nhap so luong sinh vien: " ;
+	int n;
+	cin >> n;
+	int loai;
+	for(int i = 0; i < n; i++) {
+		cout <<" Sinh vien thu " << i+1 <<": " << endl ;
+		cout <<" 1= sinh vien cao dang, 2= sinh vien dai hoc " << endl;
+		cin >> loai;
+
+		unique_ptr<SinhVien> sv ;
+		switch(loai) {
+		case 1:
+			sv = make_unique<SinhVien_CaoDang>() ;
+			break;
+		case 2:
+			sv = make_unique<SinhVien_DaiHoc>();
+			break;
+		default:
+			cout <<" Khong co sinh vien hop le " << endl ;
+			i--;
+			continue;
+		}
+		sv->Nhap() ;
+		dsSinhVien.push_back(move(sv));
+	}
+}
+void DH_CongNgheThongTin::Xuat() const {
+    if(dsSinhVien.empty()){
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+	cout <<"========= Dang sach sinh vien UIT: ===========" << endl;
+	for(auto& sv : dsSinhVien) {
+		sv->Xuat();
+	}
+}
+void DH_CongNgheThongTin::XuatSinhVien_TotNghiep() const {
+
+	cout <<"========Sinh vien du dieu kien tot nghiep========" << endl;
+	for(auto& sv : dsSinhVien) {
+		if(dynamic_cast<SinhVien_CaoDang*>(sv.get())) {
+			if(sv->getSoChi() >= 120 &&sv->getDiemTb() >= 5 &&sv->getDiem_TotNghiep() >= 5) {
+				sv->Xuat();
+			}
+		}
+		if(dynamic_cast<SinhVien_DaiHoc*>(sv.get())) {
+			if(sv->getSoChi() >= 170 &&sv->getDiemTb() >= 5 &&sv->getDiem_LuanVan() >= 5) sv->Xuat();
+		}
+	}
+}
+void DH_CongNgheThongTin::XuatSinhVien_0_TotNghiep() const {
+	int dh = 0 ;
+	int cd = 0 ;
+	cout <<"=======SInh vien chua du dieu kien tot nghiep===========" << endl;
+	for(auto& sv : dsSinhVien) {
+		if(dynamic_cast<SinhVien_CaoDang*>(sv.get())) {
+			if(sv->getSoChi() < 120 ||sv->getDiemTb() < 5 ||sv->getDiem_TotNghiep() < 5) {
+				sv->Xuat();
+				cd++;
+			}
+		}
+		if(dynamic_cast<SinhVien_DaiHoc*>(sv.get())) {
+			if(sv->getSoChi() < 170 ||sv->getDiemTb() < 5 ||sv->getDiem_LuanVan() < 5) {
+				sv->Xuat();
+				dh++;
+			}
+		}
+	}
+	cout <<" Co " << cd <<" sinh vien cao dang khong du tot nghiep " << endl ;
+	cout <<" Co " << dh <<" sinh vien dai hoc khong du tot nghiep " << endl;
 }
 
+void DH_CongNgheThongTin::maxTBSinhVien_DH() const {
+	int index = -1 ;
+	double maxTB = -1 ;
+	for(int i = 0 ; i < dsSinhVien.size(); i++) {
+		if(dynamic_cast<SinhVien_DaiHoc*>(dsSinhVien[i].get()) && dsSinhVien[i]->getDiemTb() > maxTB) {
+			maxTB = dsSinhVien[i]->getDiemTb();
+			index = i ;
+		}
+	}
+	if(index != -1){
+	cout <<"======Sinh vien dai hoc co diem trung binh lon nhat====== " << endl ;
+	dsSinhVien[index]->Xuat() ;
+	}
+	else cout <<" Khong co sinh vien dai hoc " << endl;
+}
+void DH_CongNgheThongTin::maxTBSinhVien_CD() const {
+	int index = -1 ;
+	double maxTB = -1 ;
+	for(int i = 0 ; i < dsSinhVien.size(); i++) {
+		if(dynamic_cast<SinhVien_CaoDang*>(dsSinhVien[i].get()) && dsSinhVien[i]->getDiemTb() > maxTB) {
+			maxTB = dsSinhVien[i]->getDiemTb();
+			index = i ;
+		}
+	}
+	if(index != -1){
+	cout <<"======Sinh vien cao dang co diem trung binh lon nhat====== " << endl ;
+	dsSinhVien[index]->Xuat() ;
+	}
+	else cout <<" Khong co sinh vien cao dang " << endl;
+}
 int main()
 {
-	std::cout<<"Hello World";
+	DH_CongNgheThongTin dh ;
+	dh.Nhap() ;
+	dh.Xuat() ;
+	dh.XuatSinhVien_0_TotNghiep() ;
+	dh.XuatSinhVien_TotNghiep();
+	dh.maxTBSinhVien_CD();
+	dh.maxTBSinhVien_DH();
 
 	return 0;
 }
