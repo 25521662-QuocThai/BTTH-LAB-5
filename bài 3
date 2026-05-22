@@ -240,6 +240,7 @@ void DH_CongNgheThongTin::maxTBSinhVien_CD() const {
 	}
 	else cout <<" Khong co sinh vien cao dang " << endl;
 }
+//=========MAIN===========
 int main()
 {
 	DH_CongNgheThongTin dh ;
