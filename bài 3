@@ -86,6 +86,7 @@ using namespace std;
 // CLASS SINH VIEN
 void SinhVien::Nhap() {
 	cout <<" Nhap ho va ten: " ;
+	cin.ignore();
 	getline(cin, HovaTen);
 	cout <<" Nhap ma sinh vien: ";
 	getline(cin, ma_Sv);
@@ -141,8 +142,8 @@ void DH_CongNgheThongTin::Nhap() {
 	cin >> n;
 	int loai;
 	for(int i = 0; i < n; i++) {
-		cout <<" Sinh vien thu " << i+1 <<": " << endl ;
-		cout <<" 1= sinh vien cao dang, 2= sinh vien dai hoc " << endl;
+	    cout <<"=============Sinh vien thu " << i+1 <<"=============" << endl ;
+		cout <<" 1= sinh vien cao dang, 2= sinh vien dai hoc: ";
 		cin >> loai;
 // tao smart pointer kieu SinhVien
 		unique_ptr<SinhVien> sv ;
@@ -175,23 +176,31 @@ void DH_CongNgheThongTin::Xuat() const {
 	}
 }
 void DH_CongNgheThongTin::XuatSinhVien_TotNghiep() const {
+    int dh = 0 ;
+	int cd = 0 ;
 
 	cout <<"========Sinh vien du dieu kien tot nghiep========" << endl;
 	for(auto& sv : dsSinhVien) {
 		if(dynamic_cast<SinhVien_CaoDang*>(sv.get())) {
 			if(sv->getSoChi() >= 120 &&sv->getDiemTb() >= 5 &&sv->getDiem_TotNghiep() >= 5) {
-				sv->Xuat();
+				sv->Xuat(); 
+				cd++;
 			}
 		}
 		if(dynamic_cast<SinhVien_DaiHoc*>(sv.get())) {
-			if(sv->getSoChi() >= 170 &&sv->getDiemTb() >= 5 &&sv->getDiem_LuanVan() >= 5) sv->Xuat();
+			if(sv->getSoChi() >= 170 &&sv->getDiemTb() >= 5 &&sv->getDiem_LuanVan() >= 5){ 
+			    sv->Xuat();
+			    dh++;
+			}
 		}
 	}
+	cout <<" Co " << cd <<" sinh vien cao dang du tot nghiep " << endl ;
+	cout <<" Co " << dh <<" sinh vien dai hoc du tot nghiep " << endl;
 }
 void DH_CongNgheThongTin::XuatSinhVien_0_TotNghiep() const {
 	int dh = 0 ;
 	int cd = 0 ;
-	cout <<"=======SInh vien chua du dieu kien tot nghiep===========" << endl;
+	cout <<"=======Sinh vien chua du dieu kien tot nghiep===========" << endl;
 	for(auto& sv : dsSinhVien) {
 		if(dynamic_cast<SinhVien_CaoDang*>(sv.get())) {
 			if(sv->getSoChi() < 120 ||sv->getDiemTb() < 5 ||sv->getDiem_TotNghiep() < 5) {
