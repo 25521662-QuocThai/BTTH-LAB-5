@@ -144,13 +144,15 @@ void DH_CongNgheThongTin::Nhap() {
 		cout <<" Sinh vien thu " << i+1 <<": " << endl ;
 		cout <<" 1= sinh vien cao dang, 2= sinh vien dai hoc " << endl;
 		cin >> loai;
-
+// tao smart pointer kieu SinhVien
 		unique_ptr<SinhVien> sv ;
 		switch(loai) {
 		case 1:
+// make_unique tao doi tuong con moi kieu SinhVien_CaoDang
 			sv = make_unique<SinhVien_CaoDang>() ;
 			break;
 		case 2:
+// make_unique tao doi tuong con moi kieu SinhVien_DaiHoc
 			sv = make_unique<SinhVien_DaiHoc>();
 			break;
 		default:
