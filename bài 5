@@ -131,10 +131,7 @@ void KhachHangA::xuatFile(std::ofstream& fout) const {
     KhachHang::xuatFile(fout);
 }
  
- 
-// =====================================================
-//  TRIỂN KHAI LỚP CON B: KhachHangB
-// =====================================================
+//=======CLASS  KhachHangB==========
  
 KhachHangB::KhachHangB(std::string ten, int soLuong, double donGia, int soNam)
     : KhachHang(ten, soLuong, donGia), soNamThanThiet(soNam) {}
@@ -157,10 +154,7 @@ void KhachHangB::xuatFile(std::ofstream& fout) const {
     KhachHang::xuatFile(fout);
 }
  
- 
-// =====================================================
-//  TRIỂN KHAI LỚP CON C: KhachHangC
-// =====================================================
+//=========CLASS KhachHangC===========
  
 KhachHangC::KhachHangC(std::string ten, int soLuong, double donGia)
     : KhachHang(ten, soLuong, donGia) {}
@@ -178,10 +172,7 @@ void KhachHangC::xuatFile(std::ofstream& fout) const {
     KhachHang::xuatFile(fout);
 }
  
- 
-// =====================================================
-//  TRIỂN KHAI LỚP QUẢN LÝ: CongTyXYZ
-// =====================================================
+//=========CLASS CongTyXYZ===========
  
 void CongTyXYZ::docTuFile(const std::string& tenFile) {
     std::ifstream fin(tenFile);
