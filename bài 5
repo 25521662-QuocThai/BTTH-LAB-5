@@ -252,11 +252,11 @@ int main() {
     try {
         CongTyXYZ congTy;
  
-        // Bước 1: Đọc dữ liệu từ XYZ.INP
+        //  Đọc dữ liệu từ XYZ.INP
         congTy.docTuFile("XYZ.INP");
         std::cout << "Doc file thanh cong!\n";
  
-        // Bước 2 & 3: Tính tiền và xuất ra XYZ.OUT
+        //  Tính tiền và xuất ra XYZ.OUT
         congTy.xuatRaFile("XYZ.OUT");
         std::cout << "Xuat file thanh cong!\n";
         std::cout << "Tong tien cong ty thu: "
