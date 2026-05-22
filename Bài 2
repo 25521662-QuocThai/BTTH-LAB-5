@@ -191,7 +191,6 @@ void Time::Xuat() const {
 
 // ========== CLASS GIAODICH ==========
 void GiaoDich::Nhap() {
-    cin.ignore();  
     cout << "Nhap ma giao dich: ";
     getline(cin, ma_GD);
     
@@ -202,6 +201,7 @@ void GiaoDich::Nhap() {
     cin >> DonGia;
     cout << "Dien tich san pham: ";
     cin >> DienTich;
+    cin.ignore();
 }
 // Hàm xuất
 void GiaoDich::Xuat() const {
@@ -335,12 +335,24 @@ void Congty::Nhap() {
         unique_ptr<GiaoDich> gd;
         
         switch(loai) {
-            case 1: gd = make_unique<Dat_Loai_A>(); break;
-            case 2: gd = make_unique<Dat_Loai_B>(); break;
-            case 3: gd = make_unique<Dat_Loai_C>(); break;
-            case 4: gd = make_unique<Nha_Cao_Cap>(); break;
-            case 5: gd = make_unique<Nha_Thuong>(); break;
-            case 6: gd = make_unique<CanHoChungCu>(); break;
+            case 1: 
+            cout <<"\n====Dat loai A=====" << endl;
+            gd = make_unique<Dat_Loai_A>(); break;
+            case 2: 
+            cout <<"\n====Dat loai B=====" << endl;
+            gd = make_unique<Dat_Loai_B>(); break;
+            case 3: 
+            cout <<"\n====Dat loai C=====" << endl;
+            gd = make_unique<Dat_Loai_C>(); break;
+            case 4: 
+            cout <<"\n====Nha cao cap=====" << endl;
+            gd = make_unique<Nha_Cao_Cap>(); break;
+            case 5: 
+            cout <<"\n====Nha thuong=====" << endl;
+            gd = make_unique<Nha_Thuong>(); break;
+            case 6: 
+            cout <<"\n====Can ho chung cu=====" << endl;
+            gd = make_unique<CanHoChungCu>(); break;
             default:
                 cout << "Khong hop le!\n";
                 i--;
