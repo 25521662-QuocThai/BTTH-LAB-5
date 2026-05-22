@@ -71,7 +71,7 @@ public:
  
  
 
-//  CLASS CING TY 
+//  CLASS CONG TY 
 class CongTyXYZ {
 private:
     std::vector<KhachHangA*> dsKhachA;
@@ -87,4 +87,194 @@ public:
     ~CongTyXYZ();
 };
  
-#endif // KHACHHANG_H
+#endif 
+
+#include "KhachHang.h"
+#include <iomanip>
+#include <algorithm>  // dùng cho min()
+
+//=====CLASS KHACH HANG========
+KhachHang::KhachHang(std::string ten, int soLuong, double donGia)
+    : tenKhachHang(ten), soLuongHang(soLuong), donGiaHang(donGia) {}
+ 
+std::string KhachHang::getTen() const {
+    return tenKhachHang;
+}
+ 
+void KhachHang::docFile(std::ifstream& fin) {
+    // Đọc 3 trường chung: tên, số lượng, đơn giá
+    fin >> tenKhachHang >> soLuongHang >> donGiaHang;
+}
+ 
+void KhachHang::xuatFile(std::ofstream& fout) const {
+    // In tên và số tiền phải trả (làm tròn 2 chữ số thập phân)
+    fout << tenKhachHang << "\n"
+         << std::fixed << std::setprecision(2) << tinhTien() << "\n";
+}
+
+//========CLASS KhachHangA===============
+ 
+KhachHangA::KhachHangA(std::string ten, int soLuong, double donGia)
+    : KhachHang(ten, soLuong, donGia) {}
+ 
+double KhachHangA::tinhTien() const {
+    // Tiền = SL * DG + 10% VAT
+    return soLuongHang * donGiaHang * 1.1;
+}
+ 
+void KhachHangA::docFile(std::ifstream& fin) {
+    // Loại A chỉ cần đọc 3 trường chung → gọi lớp cha
+    KhachHang::docFile(fin);
+}
+ 
+void KhachHangA::xuatFile(std::ofstream& fout) const {
+    KhachHang::xuatFile(fout);
+}
+ 
+ 
+// =====================================================
+//  TRIỂN KHAI LỚP CON B: KhachHangB
+// =====================================================
+ 
+KhachHangB::KhachHangB(std::string ten, int soLuong, double donGia, int soNam)
+    : KhachHang(ten, soLuong, donGia), soNamThanThiet(soNam) {}
+ 
+double KhachHangB::tinhTien() const {
+    // KM% = MIN(soNam * 5%, 50%)  
+    double phanTramKM = std::min(soNamThanThiet * 0.05, 0.50);
+ 
+    // Tiền = SL * DG * (1 - KM%) * 1.1
+    return soLuongHang * donGiaHang * (1.0 - phanTramKM) * 1.1;
+}
+ 
+void KhachHangB::docFile(std::ifstream& fin) {
+   
+    KhachHang::docFile(fin);
+    fin >> soNamThanThiet;
+}
+ 
+void KhachHangB::xuatFile(std::ofstream& fout) const {
+    KhachHang::xuatFile(fout);
+}
+ 
+ 
+// =====================================================
+//  TRIỂN KHAI LỚP CON C: KhachHangC
+// =====================================================
+ 
+KhachHangC::KhachHangC(std::string ten, int soLuong, double donGia)
+    : KhachHang(ten, soLuong, donGia) {}
+ 
+double KhachHangC::tinhTien() const {
+    // Tiền = SL * DG * 50% + 10% VAT = SL * DG * 0.5 * 1.1
+    return soLuongHang * donGiaHang * 0.5 * 1.1;
+}
+ 
+void KhachHangC::docFile(std::ifstream& fin) {
+    KhachHang::docFile(fin);
+}
+ 
+void KhachHangC::xuatFile(std::ofstream& fout) const {
+    KhachHang::xuatFile(fout);
+}
+ 
+ 
+// =====================================================
+//  TRIỂN KHAI LỚP QUẢN LÝ: CongTyXYZ
+// =====================================================
+ 
+void CongTyXYZ::docTuFile(const std::string& tenFile) {
+    std::ifstream fin(tenFile);
+    if (!fin.is_open()) {
+        throw std::runtime_error("Khong mo duoc file: " + tenFile);
+    }
+ 
+    int x, y, z;
+    fin >> x >> y >> z;  // Đọc số lượng mỗi loại
+ 
+    // Đọc x khách hàng loại A
+    for (int i = 0; i < x; i++) {
+        KhachHangA* kh = new KhachHangA();
+        kh->docFile(fin);
+        dsKhachA.push_back(kh);
+    }
+ 
+    // Đọc y khách hàng loại B
+    for (int i = 0; i < y; i++) {
+        KhachHangB* kh = new KhachHangB();
+        kh->docFile(fin);
+        dsKhachB.push_back(kh);
+    }
+ 
+    // Đọc z khách hàng loại C
+    for (int i = 0; i < z; i++) {
+        KhachHangC* kh = new KhachHangC();
+        kh->docFile(fin);
+        dsKhachC.push_back(kh);
+    }
+ 
+    fin.close();
+}
+ 
+void CongTyXYZ::xuatRaFile(const std::string& tenFile) const {
+    std::ofstream fout(tenFile);
+    if (!fout.is_open()) {
+        throw std::runtime_error("Khong mo duoc file: " + tenFile);
+    }
+ 
+    // Dòng đầu: x y z
+    fout << dsKhachA.size() << " "
+         << dsKhachB.size() << " "
+         << dsKhachC.size() << "\n";
+ 
+    // Xuất từng nhóm
+    for (const auto* kh : dsKhachA) kh->xuatFile(fout);
+    for (const auto* kh : dsKhachB) kh->xuatFile(fout);
+    for (const auto* kh : dsKhachC) kh->xuatFile(fout);
+ 
+    // Tổng tiền công ty thu được
+    fout << std::fixed << std::setprecision(2)
+         << tinhTongTien() << "\n";
+ 
+    fout.close();
+}
+ 
+double CongTyXYZ::tinhTongTien() const {
+    double tong = 0;
+    for (const auto* kh : dsKhachA) tong += kh->tinhTien();
+    for (const auto* kh : dsKhachB) tong += kh->tinhTien();
+    for (const auto* kh : dsKhachC) tong += kh->tinhTien();
+    return tong;
+}
+ 
+CongTyXYZ::~CongTyXYZ() {
+    // Giải phóng bộ nhớ cấp bằng new
+    for (auto* kh : dsKhachA) delete kh;
+    for (auto* kh : dsKhachB) delete kh;
+    for (auto* kh : dsKhachC) delete kh;
+}
+
+#include <iostream>
+#include "KhachHang.h"
+ 
+int main() {
+    try {
+        CongTyXYZ congTy;
+ 
+        // Bước 1: Đọc dữ liệu từ XYZ.INP
+        congTy.docTuFile("XYZ.INP");
+        std::cout << "Doc file thanh cong!\n";
+ 
+        // Bước 2 & 3: Tính tiền và xuất ra XYZ.OUT
+        congTy.xuatRaFile("XYZ.OUT");
+        std::cout << "Xuat file thanh cong!\n";
+        std::cout << "Tong tien cong ty thu: "
+                  << congTy.tinhTongTien() << "\n";
+ 
+    } catch (const std::exception& e) {
+        std::cerr << "Loi: " << e.what() << "\n";
+        return 1;
+    }
+ 
+    return 0;
+}
