@@ -1,0 +1,90 @@
+#ifndef KHACHHANG_H
+#define KHACHHANG_H
+ 
+#include <string>
+#include <vector>
+#include <fstream>
+ 
+class KhachHang {
+protected:
+    std::string tenKhachHang;
+    int         soLuongHang;
+    double      donGiaHang;
+ 
+public:
+    // Constructor
+    KhachHang(std::string ten, int soLuong, double donGia);
+ 
+    // Getter
+    std::string getTen() const;
+ 
+    
+    virtual double tinhTien() const = 0;
+ 
+    virtual void docFile(std::ifstream& fin);
+ 
+    virtual void xuatFile(std::ofstream& fout) const;
+ 
+    // Destructor 
+    virtual ~KhachHang() {}
+};
+ 
+ 
+
+//  Khách hàng bình thường
+class KhachHangA : public KhachHang {
+public:
+    KhachHangA(std::string ten = "", int soLuong = 0, double donGia = 0);
+ 
+    double tinhTien() const override;
+    void docFile(std::ifstream& fin) override;
+    void xuatFile(std::ofstream& fout) const override;
+};
+ 
+ 
+
+//  Khách hàng thân thiết
+class KhachHangB : public KhachHang {
+private:
+    int soNamThanThiet;
+ 
+public:
+    KhachHangB(std::string ten = "", int soLuong = 0,
+               double donGia = 0, int soNam = 0);
+ 
+    double tinhTien() const override;
+    void docFile(std::ifstream& fin) override;
+    void xuatFile(std::ofstream& fout) const override;
+};
+ 
+ 
+
+//Khách hàng đặc biệt
+class KhachHangC : public KhachHang {
+public:
+    KhachHangC(std::string ten = "", int soLuong = 0, double donGia = 0);
+ 
+    double tinhTien() const override;
+    void docFile(std::ifstream& fin) override;
+    void xuatFile(std::ofstream& fout) const override;
+};
+ 
+ 
+
+//  CLASS CING TY 
+class CongTyXYZ {
+private:
+    std::vector<KhachHangA*> dsKhachA;
+    std::vector<KhachHangB*> dsKhachB;
+    std::vector<KhachHangC*> dsKhachC;
+ 
+public:
+    void docTuFile(const std::string& tenFile);
+    void xuatRaFile(const std::string& tenFile) const;
+    double tinhTongTien() const;
+ 
+    // Destructor: giải phóng bộ nhớ cấp động
+    ~CongTyXYZ();
+};
+ 
+#endif // KHACHHANG_H
