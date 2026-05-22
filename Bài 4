@@ -1,0 +1,374 @@
+#ifndef NHANVIEN_H
+#define NHANVIEN_H
+
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <iomanip>
+#include <limits>
+using namespace std;
+
+// ========== BASE CLASS: NHAN VIEN ==========
+class NhanVien {
+    protected:
+    string maNV;
+    string hoTen;
+    int tuoi;
+    string sdt;
+    string email;
+    double luongCoBan;
+    
+    public:
+    NhanVien() : maNV(""), hoTen(""), tuoi(0), sdt(""), email(""), luongCoBan(0) {}
+    virtual ~NhanVien() {}
+    
+    virtual void Nhap();
+    virtual void Xuat() const;
+    
+    // Pure virtual functions
+    virtual double tinhLuong() const = 0;
+    virtual string getLoaiNhanVien() const = 0;
+    
+    // Getter
+    double getLuongCoBan() const { return luongCoBan; }
+    int getTuoi() const { return tuoi; }
+    string getMaNV() const { return maNV; }
+    string getHoTen() const { return hoTen; }
+};
+
+// ========== LAP TRINH VIEN ==========
+class LapTrinhVien : public NhanVien {
+    private:
+    int soGioOvertime;
+    
+    public:
+    LapTrinhVien() : NhanVien(), soGioOvertime(0) {}
+    virtual ~LapTrinhVien() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    
+    double tinhLuong() const override;
+    string getLoaiNhanVien() const override { return "Lap Trinh Vien"; }
+    
+    int getSoGioOvertime() const { return soGioOvertime; }
+};
+
+// ========== KIEM CHUNG VIEN ==========
+class KiemChungVien : public NhanVien {
+    private:
+    int soLoiPhatHien;
+    
+    public:
+    KiemChungVien() : NhanVien(), soLoiPhatHien(0) {}
+    virtual ~KiemChungVien() {}
+    
+    void Nhap() override;
+    void Xuat() const override;
+    
+    double tinhLuong() const override;
+    string getLoaiNhanVien() const override { return "Kiem Chung Vien"; }
+    
+    int getSoLoiPhatHien() const { return soLoiPhatHien; }
+};
+
+// ========== CONG TY ==========
+class CongTy {
+    private:
+    vector<unique_ptr<NhanVien>> dsNhanVien;
+    
+    public:
+    CongTy() = default;
+    ~CongTy() = default;
+    
+    void Nhap();
+    void Xuat() const;
+    
+    double tinhLuongTrungBinh() const;
+    
+    void xuatNhanVienDuoiTrungBinh() const;
+    void xuatNhanVienLuongCaoNhat() const;
+    void xuatNhanVienLuongThapNhat() const;
+    void xuatLTVLuongCaoNhat() const;
+    void xuatKCVLuongThapNhat() const;
+};
+
+#endif
+
+#include "NhanVien.h"
+using namespace std;
+
+// ========== CLASS NHAN VIEN ==========
+void NhanVien::Nhap() {
+    cout << "Nhap ma nhan vien: ";
+    getline(cin, maNV);
+    
+    cout << "Nhap ho va ten: ";
+    getline(cin, hoTen);
+    
+    cout << "Nhap tuoi: ";
+    cin >> tuoi;
+    cin.ignore();
+    
+    cout << "Nhap so dien thoai: ";
+    getline(cin, sdt);
+    
+    cout << "Nhap email: ";
+    getline(cin, email);
+    
+    cout << "Nhap luong co ban: ";
+    cin >> luongCoBan;
+    cin.ignore();
+}
+
+void NhanVien::Xuat() const {
+    cout << "Ma NV: " << maNV << endl;
+    cout << "Ho ten: " << hoTen << endl;
+    cout << "Tuoi: " << tuoi << endl;
+    cout << "So dien thoai: " << sdt << endl;
+    cout << "Email: " << email << endl;
+    cout << "Luong co ban: " << fixed << setprecision(0) << luongCoBan << endl;
+}
+
+// ========== CLASS LAP TRINH VIEN ==========
+void LapTrinhVien::Nhap() {
+    cout << "\n===== NHAP THONG TIN LAP TRINH VIEN =====" << endl;
+    NhanVien::Nhap();
+    
+    cout << "Nhap so gio overtime: ";
+    cin >> soGioOvertime;
+    cin.ignore();
+}
+
+void LapTrinhVien::Xuat() const {
+    cout << "\n===== THONG TIN LAP TRINH VIEN =====" << endl;
+    NhanVien::Xuat();
+    cout << "So gio overtime: " << soGioOvertime << endl;
+    cout << "Luong thang: " << fixed << setprecision(0) << tinhLuong() << endl;
+}
+
+double LapTrinhVien::tinhLuong() const {
+    return luongCoBan + soGioOvertime * 200000;
+}
+
+// ========== CLASS KIEM CHUNG VIEN ==========
+void KiemChungVien::Nhap() {
+    cout << "\n===== NHAP THONG TIN KIEM CHUNG VIEN =====" << endl;
+    NhanVien::Nhap();
+    
+    cout << "Nhap so loi phat hien: ";
+    cin >> soLoiPhatHien;
+    cin.ignore();
+}
+
+void KiemChungVien::Xuat() const {
+    cout << "\n===== THONG TIN KIEM CHUNG VIEN =====" << endl;
+    NhanVien::Xuat();
+    cout << "So loi phat hien: " << soLoiPhatHien << endl;
+    cout << "Luong thang: " << fixed << setprecision(0) << tinhLuong() << endl;
+}
+
+double KiemChungVien::tinhLuong() const {
+    return luongCoBan + soLoiPhatHien * 50000;
+}
+
+// ========== CLASS CONG TY ==========
+void CongTy::Nhap() {
+    cout << "Nhap so luong nhan vien: ";
+    int n;
+    cin >> n;
+    cin.ignore();
+    
+    for(int i = 0; i < n; i++) {
+        cout << "\n--- Nhan vien thu " << i+1 << " ---" << endl;
+        cout << "1=Lap Trinh Vien, 2=Kiem Chung Vien: ";
+        int loai;
+        cin >> loai;
+        cin.ignore();
+        
+        unique_ptr<NhanVien> nv;
+        
+        switch(loai) {
+            case 1:
+                nv = make_unique<LapTrinhVien>();
+                break;
+            case 2:
+                nv = make_unique<KiemChungVien>();
+                break;
+            default:
+                cout << "Loai khong hop le!" << endl;
+                i--;
+                continue;
+        }
+        
+        nv->Nhap();
+        dsNhanVien.push_back(move(nv));
+    }
+}
+
+void CongTy::Xuat() const {
+    if(dsNhanVien.empty()) {
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+    
+    cout << "\n========= DANH SACH NHAN VIEN CONG TY ==========" << endl;
+    for(auto& nv : dsNhanVien) {
+        nv->Xuat();
+        cout << string(60, '-') << endl;
+    }
+}
+
+// Tính lương trung bình
+double CongTy::tinhLuongTrungBinh() const {
+    if(dsNhanVien.empty()) {
+        return 0;
+    }
+    
+    double tongLuong = 0;
+    for(auto& nv : dsNhanVien) {
+        tongLuong += nv->tinhLuong();
+    }
+    
+    return tongLuong / dsNhanVien.size();
+}
+
+// Xuất nhân viên có lương dưới trung bình
+void CongTy::xuatNhanVienDuoiTrungBinh() const {
+    if(dsNhanVien.empty()) {
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+    
+    double luongTB = tinhLuongTrungBinh();
+    cout << "\n===== NHAN VIEN CO LUONG DUOI TRUNG BINH =====" << endl;
+    cout << "Luong trung binh: " << fixed << setprecision(0) << luongTB << endl;
+    cout << endl;
+    
+    bool found = false;
+    for(auto& nv : dsNhanVien) {
+        if(nv->tinhLuong() < luongTB) {
+            nv->Xuat();
+            cout << string(60, '-') << endl;
+            found = true;
+        }
+    }
+    
+    if(!found) {
+        cout << "Khong co nhan vien co luong duoi trung binh!" << endl;
+    }
+}
+
+// Xuất nhân viên có lương cao nhất
+void CongTy::xuatNhanVienLuongCaoNhat() const {
+    if(dsNhanVien.empty()) {
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+    
+    int index = 0;
+    double maxLuong = dsNhanVien[0]->tinhLuong();
+    
+    for(int i = 1; i < dsNhanVien.size(); i++) {
+        if(dsNhanVien[i]->tinhLuong() > maxLuong) {
+            maxLuong = dsNhanVien[i]->tinhLuong();
+            index = i;
+        }
+    }
+    
+    cout << "\n===== NHAN VIEN CO LUONG CAO NHAT =====" << endl;
+    dsNhanVien[index]->Xuat();
+    cout << "Loai nhan vien: " << dsNhanVien[index]->getLoaiNhanVien() << endl;
+}
+
+// Xuất nhân viên có lương thấp nhất
+void CongTy::xuatNhanVienLuongThapNhat() const {
+    if(dsNhanVien.empty()) {
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+    
+    int index = 0;
+    double minLuong = dsNhanVien[0]->tinhLuong();
+    
+    for(int i = 1; i < dsNhanVien.size(); i++) {
+        if(dsNhanVien[i]->tinhLuong() < minLuong) {
+            minLuong = dsNhanVien[i]->tinhLuong();
+            index = i;
+        }
+    }
+    
+    cout << "\n===== NHAN VIEN CO LUONG THAP NHAT =====" << endl;
+    dsNhanVien[index]->Xuat();
+    cout << "Loai nhan vien: " << dsNhanVien[index]->getLoaiNhanVien() << endl;
+}
+
+//  Xuất lập trình viên có lương cao nhất
+void CongTy::xuatLTVLuongCaoNhat() const {
+    if(dsNhanVien.empty()) {
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+    
+    int index = -1;
+    double maxLuong = -1;
+    
+    for(int i = 0; i < dsNhanVien.size(); i++) {
+        if(dynamic_cast<LapTrinhVien*>(dsNhanVien[i].get())) {
+            if(dsNhanVien[i]->tinhLuong() > maxLuong) {
+                maxLuong = dsNhanVien[i]->tinhLuong();
+                index = i;
+            }
+        }
+    }
+    
+    if(index != -1) {
+        cout << "\n===== LAP TRINH VIEN CO LUONG CAO NHAT =====" << endl;
+        dsNhanVien[index]->Xuat();
+    } else {
+        cout << "Khong co lap trinh vien!" << endl;
+    }
+}
+
+// Xuất kiểm chứng viên có lương thấp nhất
+void CongTy::xuatKCVLuongThapNhat() const {
+    if(dsNhanVien.empty()) {
+        cout << "Danh sach rong!" << endl;
+        return;
+    }
+    
+    int index = -1;
+    double minLuong = numeric_limits<double>::max();
+    
+    for(int i = 0; i < dsNhanVien.size(); i++) {
+        if(dynamic_cast<KiemChungVien*>(dsNhanVien[i].get())) {
+            if(dsNhanVien[i]->tinhLuong() < minLuong) {
+                minLuong = dsNhanVien[i]->tinhLuong();
+                index = i;
+            }
+        }
+    }
+    
+    if(index != -1) {
+        cout << "\n===== KIEM CHUNG VIEN CO LUONG THAP NHAT =====" << endl;
+        dsNhanVien[index]->Xuat();
+    } else {
+        cout << "Khong co kiem chung vien!" << endl;
+    }
+}
+
+// ========== MAIN ==========
+int main() {
+    CongTy cty;
+    
+    cty.Nhap();
+    cty.Xuat();           
+    cty.xuatNhanVienDuoiTrungBinh();           
+    cty.xuatNhanVienLuongCaoNhat();           
+    cty.xuatNhanVienLuongThapNhat();          
+    cty.xuatLTVLuongCaoNhat();
+    cty.xuatKCVLuongThapNhat();
+  
+    
+    return 0;
+}
